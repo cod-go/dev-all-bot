@@ -39,7 +39,7 @@ async def on_message(message):
 
     elif message.content == '/sobre':
         await member.dm_channel.send(ABOUT)
-    
+
     elif message.content == '/adms':
         await member.dm_channel.send(ADMS)
 
