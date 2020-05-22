@@ -5,6 +5,8 @@ from rules import WELCOME, ABOUT, COMMANDS, ADMS
 import discord
 from dotenv import load_dotenv
 
+import databaser
+
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
@@ -30,7 +32,7 @@ async def on_message(message):
     if member == client.user:
         return
 
-    if message.content in COMMANDS or '/canal' in message.content:
+    if message.content in COMMANDS or '/canal' in message.content or '/poll' in message.content:
         await member.create_dm()
     else:
         return
@@ -49,6 +51,47 @@ async def on_message(message):
         for command in COMMANDS:
             response += command+'\n'
         await member.dm_channel.send(response)
+
+    elif message.content[:5] == '/poll':
+        votacao = message.content[6:]
+        votacao = votacao.split(" ")
+
+        titulo = votacao[0]
+
+        databaser.cursor.execute(f"select titulo from votacoes where titulo='{titulo}'")
+        titulo_votacao = databaser.cursor.fetchone()
+
+        if titulo_votacao is not None:
+            # Verifica se possui uma opção para voto
+            if len(votacao) > 1:
+                voto = votacao[1]
+                # Testando se a opção do voto existe
+                databaser.cursor.execute(f"select opcao from alternativas where votacao='{titulo}' and opcao='{voto}'")
+                opcao_votacao = databaser.cursor.fetchone()
+                if opcao_votacao is not None:
+                    # Registrando voto
+                    databaser.cursor.execute(f"insert into votos(nome, opcao, votacao) "
+                                             f"values ('{member.name}','{voto}','{titulo}')")
+                    databaser.conn.commit()
+            else:
+                response = f"Votação {titulo}\n"
+                # Consulta as informações sobre as opções
+                databaser.cursor.execute(f"select opcao from alternativas where votacao='{titulo}'")
+                opcoes = databaser.cursor.fetchall()
+                for opcao in opcoes:
+                    databaser.cursor.execute(f"select count(*) from votos where votacao='{titulo}' and opcao='{opcao[0]}'")
+                    total = databaser.cursor.fetchone()
+                    response += f"{opcao[0]} - {total[0]}\n"
+                await message.channel.send(response)
+        else:
+            # Registrando pergunta
+            databaser.cursor.execute(f"insert into votacoes(titulo) values ('{titulo}')")
+            databaser.conn.commit()
+            for opcao in votacao[1:]:
+                # Registrando opções
+                databaser.cursor.execute(f"insert into alternativas(opcao, votacao) "
+                                         f"values ('{opcao}', '{titulo}')")
+                databaser.conn.commit()
 
     # Verifica se a mensagem começa com /canal
     elif message.content[:6] == '/canal':
