@@ -60,7 +60,7 @@ O servidor dev.all() foi criado com o intuito de reunir a comunidade de desenvol
 servindo como espaço de aprendizagem descontraído.
 '''
 
-COMMANDS = ['/regras', '/sobre', '/adms', '/help']
+COMMANDS = ['/regras', '/sobre', '/adms', '/ajuda']
 
 ADMS = '''Sobre os Adms:\n 
 Alius: Alexa Lins \nhttps://github.com/alexalins\n 
