@@ -124,6 +124,17 @@ async def new_poll(ctx, poll_name, *options):
     await ctx.send("Votação registrada com sucesso")
 
 
+@bot.command(name='polls')
+async def polls(ctx):
+    databaser.cursor.execute(f"select titulo from votacoes")
+    titulos = databaser.cursor.fetchall()
+    print(titulos)
+    response = "Votações ativas\n"
+    for titulo in titulos:
+        response += '- ' + titulo[0] + '\n'
+    await ctx.send(response)
+
+
 @bot.command(name='cronograma')
 async def cronograma(ctx):
     response = "Cronograma\n"
