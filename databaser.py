@@ -13,7 +13,7 @@ create table if not exists alternativas(
     opcao VARCHAR(80) NOT NULL,
     votacao VARCHAR(80),
     PRIMARY KEY (opcao, votacao),
-    FOREIGN KEY (votacao) REFERENCES votacoes(id) 
+    FOREIGN KEY (votacao) REFERENCES votacoes(titulo) 
 );""")
 cursor.execute("""
 create table if not exists votos(
