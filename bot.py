@@ -1,4 +1,5 @@
 import os
+import datetime
 
 from rules import WELCOME, ABOUT, COMMANDS, ADMS
 
@@ -121,6 +122,19 @@ async def new_poll(ctx, poll_name, *options):
                                  f"values ('{opcao}', '{poll_name}')")
         databaser.conn.commit()
     await ctx.send("Votação registrada com sucesso")
+
+
+@bot.command(name='cronograma')
+async def cronograma(ctx):
+    response = "Cronograma\n"
+    databaser.cursor.execute("SELECT titulo, orador, data FROM cronogramas")
+    cronogramas = databaser.cursor.fetchall()
+    for row in cronogramas:
+        data = datetime.datetime.strptime(row[2], '%Y-%m-%d').date()
+        data = data.strftime('%d/%m/%Y')
+        response += f'- {row[0]} - {row[1]} - {data}\n'
+    await ctx.author.create_dm()
+    await ctx.author.dm_channel.send(response)
 
 
 @bot.event

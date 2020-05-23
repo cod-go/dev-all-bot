@@ -23,5 +23,14 @@ create table if not exists votos(
     PRIMARY KEY (nome, votacao),
     FOREIGN KEY (opcao, votacao) REFERENCES alternativas(opcao, votacao)
 )""")
+cursor.execute("""
+create table if not exists cronogramas(
+	titulo VARCHAR(80),
+	orador VARCHAR(80),
+	descricao VARCHAR(120),
+	data DATE,
+	primary key (titulo)
+);
+""")
 
 print("Conectado ao banco de dados")
